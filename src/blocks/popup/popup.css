@@ -8,9 +8,12 @@
 @import url('./__caption/popup__caption.css');
 @import url('./__image/popup__image.css');
 
+body:not(.page_loaded) .popup {
+  display: none !important;
+}
+
 .popup {
   font-family: 'Inter', Arial, sans-serif;
-  display: none;
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, .5);
@@ -20,4 +23,13 @@
   bottom: 0;
   right: 0;
   z-index: 10;
+
+  display: flex;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: visibility 0s 0.6s, opacity 0.6s;
 }
+
+
