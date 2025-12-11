@@ -1,18 +1,15 @@
-// modal.js — универсальный модуль работы с попапами
-
-// Открыть любой попап
 export function openModal(popup) {
    popup.classList.add('popup_is-opened');
    document.addEventListener('keydown', handleEscClose);
 }
 
-// Закрыть любой попап
+
 export function closeModal(popup) {
    popup.classList.remove('popup_is-opened');
    document.removeEventListener('keydown', handleEscClose);
 }
 
-// Закрытие по Escape
+
 function handleEscClose(evt) {
    if (evt.key === 'Escape') {
       const openedModal = document.querySelector('.popup_is-opened');
@@ -20,7 +17,7 @@ function handleEscClose(evt) {
    }
 }
 
-// Закрытие по оверлею
+
 function overlayClose() {
    const modals = document.querySelectorAll('.popup');
    modals.forEach(popup => {
@@ -30,7 +27,7 @@ function overlayClose() {
    });
 }
 
-// Закрытие по кнопке X
+
 function closeButtons() {
    const modals = document.querySelectorAll('.popup');
    modals.forEach(popup => {
@@ -39,7 +36,6 @@ function closeButtons() {
    });
 }
 
-// Инициализация всех базовых закрытий попапов
 export function initModals() {
    overlayClose();
    closeButtons();

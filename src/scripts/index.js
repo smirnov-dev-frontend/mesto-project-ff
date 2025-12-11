@@ -6,7 +6,6 @@ import { initModals, openModal, closeModal } from './modal.js';
 document.addEventListener('DOMContentLoaded', () => {
 
    requestAnimationFrame(() => {
-      // Всё инициализируем
       initModals();
       initProfileEditing();
       initCards();
@@ -15,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// ---------------------- Карточки ----------------------
+
 function initCards() {
    const placesWrap = document.querySelector(".places__list");
 
@@ -29,7 +28,7 @@ function initCards() {
    });
 }
 
-// ---------------------- Просмотр изображения ----------------------
+
 function openImagePopup(imageSrc, imageAlt) {
    const imagePopup = document.querySelector('.popup_type_image');
    const popupImage = imagePopup.querySelector('.popup__image');
@@ -42,7 +41,7 @@ function openImagePopup(imageSrc, imageAlt) {
    openModal(imagePopup);
 }
 
-// ---------------------- Редактирование профиля ----------------------
+
 function initProfileEditing() {
    const editButton = document.querySelector('.profile__edit-button');
    const editModal = document.querySelector('.popup_type_edit');
@@ -66,7 +65,7 @@ function initProfileEditing() {
    });
 }
 
-// ---------------------- Добавление новой карточки ----------------------
+
 function initCardForm() {
    const addButton = document.querySelector('.profile__add-button');
    const addModal = document.querySelector('.popup_type_new-card');
