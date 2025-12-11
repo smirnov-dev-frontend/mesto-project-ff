@@ -8,9 +8,6 @@
 @import url('./__caption/popup__caption.css');
 @import url('./__image/popup__image.css');
 
-body:not(.page_loaded) .popup {
-  display: none !important;
-}
 
 .popup {
   font-family: 'Inter', Arial, sans-serif;
@@ -22,7 +19,7 @@ body:not(.page_loaded) .popup {
   left: 0;
   bottom: 0;
   right: 0;
-  z-index: 10;
+  z-index: -1;
 
   display: flex;
   visibility: hidden;

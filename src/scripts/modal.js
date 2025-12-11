@@ -1,81 +1,46 @@
-const modals = document.querySelectorAll('.popup');
+// modal.js — универсальный модуль работы с попапами
 
+// Открыть любой попап
 export function openModal(popup) {
    popup.classList.add('popup_is-opened');
    document.addEventListener('keydown', handleEscClose);
 }
 
+// Закрыть любой попап
 export function closeModal(popup) {
    popup.classList.remove('popup_is-opened');
    document.removeEventListener('keydown', handleEscClose);
 }
 
-export function openImagePopup(imageSrc, imageAlt, caption) {
-   const imagePopup = document.querySelector('.popup_type_image');
-   if (!imagePopup) return;
-
-   const popupImage = imagePopup.querySelector('.popup__image');
-   const popupCaption = imagePopup.querySelector('.popup__caption');
-
-   if (popupImage && popupCaption) {
-      popupImage.src = imageSrc;
-      popupImage.alt = imageAlt;
-      popupCaption.textContent = caption;
-
-      openModal(imagePopup);
-   }
-}
-
-export function handleImageClick(imageSrc, imageAlt, caption) {
-   openImagePopup(imageSrc, imageAlt, caption);
-}
-
+// Закрытие по Escape
 function handleEscClose(evt) {
    if (evt.key === 'Escape') {
       const openedModal = document.querySelector('.popup_is-opened');
-      if (openedModal) {
-         closeModal(openedModal);
-      }
+      if (openedModal) closeModal(openedModal);
    }
 }
 
+// Закрытие по оверлею
 function overlayClose() {
+   const modals = document.querySelectorAll('.popup');
    modals.forEach(popup => {
-      popup.addEventListener('click', function (evt) {
-         if (evt.target === popup) {
-            closeModal(popup);
-         }
+      popup.addEventListener('mousedown', (evt) => {
+         if (evt.target === popup) closeModal(popup);
       });
    });
 }
 
+// Закрытие по кнопке X
 function closeButtons() {
+   const modals = document.querySelectorAll('.popup');
    modals.forEach(popup => {
       const closeBtn = popup.querySelector('.popup__close');
-      if (closeBtn) {
-         closeBtn.addEventListener('click', () => closeModal(popup));
-      }
+      if (closeBtn) closeBtn.addEventListener('click', () => closeModal(popup));
    });
 }
 
-function openButtons() {
-   const editButton = document.querySelector('.profile__edit-button');
-   const editModal = document.querySelector('.popup_type_edit');
-
-   if (editButton && editModal) {
-      editButton.addEventListener('click', () => openModal(editModal));
-   }
-
-   const addButton = document.querySelector('.profile__add-button');
-   const addModal = document.querySelector('.popup_type_new-card');
-
-   if (addButton && addModal) {
-      addButton.addEventListener('click', () => openModal(addModal));
-   }
-}
-
+// Инициализация всех базовых закрытий попапов
 export function initModals() {
    overlayClose();
    closeButtons();
-   openButtons();
 }
