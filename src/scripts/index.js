@@ -4,12 +4,21 @@ import { createCard, handleDeleteCard, handleLikeCard } from './card.js';
 import { initModals, openModal, closeModal } from './modal.js';
 import { enableValidation, clearValidation } from './validation.js';
 
+const validationConfig = {
+   formSelector: '.popup__form',
+   inputSelector: '.popup__input',
+   submitButtonSelector: '.popup__button',
+   inactiveButtonClass: 'popup__button_disabled',
+   inputErrorClass: 'popup__input_type_error',
+   errorClass: 'popup__error_visible'
+};
+
 document.addEventListener('DOMContentLoaded', () => {
    initModals();
    initProfileEditing();
    initCards();
    initCardForm();
-   enableValidation();
+   enableValidation(validationConfig);
 });
 
 function initCards() {
@@ -49,7 +58,7 @@ function initProfileEditing() {
    editButton.addEventListener('click', () => {
       nameInput.value = profileName.textContent;
       jobInput.value = profileJob.textContent;
-      clearValidation(formElement);
+      clearValidation(formElement, validationConfig);
       openModal(editModal);
    });
 
@@ -71,7 +80,7 @@ function initCardForm() {
 
    addButton.addEventListener('click', () => {
       formElement.reset();
-      clearValidation(formElement);
+      clearValidation(formElement, validationConfig);
       openModal(addModal);
    });
 
@@ -89,6 +98,7 @@ function initCardForm() {
 
       placesWrap.prepend(newCardElement);
       formElement.reset();
+      clearValidation(formElement, validationConfig);
       closeModal(addModal);
    });
 }
