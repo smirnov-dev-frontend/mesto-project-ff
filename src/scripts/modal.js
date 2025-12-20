@@ -5,7 +5,12 @@ export function openModal(popup) {
 
 
 export function closeModal(popup) {
-   popup.classList.remove('popup_is-opened');
+   popup.style.opacity = '0';
+   popup.addEventListener('transitionend', () => {
+      popup.classList.remove('popup_is-opened');
+      popup.style.opacity = '';
+   }, { once: true });
+
    document.removeEventListener('keydown', handleEscClose);
 }
 
