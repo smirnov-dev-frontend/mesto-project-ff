@@ -18,7 +18,6 @@ let userId;
 document.addEventListener('DOMContentLoaded', () => {
    initModals();
    enableValidation(validationConfig);
-   initAvatarEditing();
 
    Promise.all([getUserInfo(), getInitialCards()])
       .then(([userData, cards]) => {
@@ -30,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
    initProfileEditing();
    initCardForm();
+   initAvatarEditing();
 });
 
 function fillUserInfo({ name, about, avatar }) {
@@ -38,25 +38,19 @@ function fillUserInfo({ name, about, avatar }) {
    document.querySelector('.profile__image').src = avatar;
 }
 
-function handleFormSubmitWithLoading(form, submitCallback) {
+function handleFormSubmitWithLoading(form, makeRequest) {
    const submitButton = form.querySelector(validationConfig.submitButtonSelector);
    const initialText = submitButton.textContent;
 
-   return (...args) => {
-      submitButton.textContent = 'Сохранение...';
-      submitButton.disabled = true;
+   submitButton.textContent = 'Сохранение...';
+   submitButton.disabled = true;
 
-      submitCallback(...args)
-         .then(() => {
-            submitButton.textContent = initialText;
-            submitButton.disabled = false;
-         })
-         .catch(err => {
-            console.error(err);
-            submitButton.textContent = initialText;
-            submitButton.disabled = false;
-         });
-   };
+   makeRequest()
+      .catch(console.error)
+      .finally(() => {
+         submitButton.textContent = initialText;
+         submitButton.disabled = false;
+      });
 }
 
 function initProfileEditing() {
@@ -75,16 +69,16 @@ function initProfileEditing() {
 
    form.addEventListener('submit', (evt) => {
       evt.preventDefault();
+
       handleFormSubmitWithLoading(form, () =>
          updateUserInfo({
             name: nameInput.value.trim(),
             about: aboutInput.value.trim()
+         }).then((userData) => {
+            fillUserInfo(userData);
+            closeModal(popup);
          })
-            .then(userData => {
-               fillUserInfo(userData);
-               closeModal(popup);
-            })
-      )();
+      );
    });
 }
 
@@ -92,7 +86,7 @@ function renderInitialCards(cards) {
    const container = document.querySelector('.places__list');
    container.innerHTML = '';
 
-   cards.forEach(cardData => {
+   cards.forEach((cardData) => {
       const card = createCard(cardData, {
          userId,
          onImageClick: openImagePopup
@@ -130,18 +124,17 @@ function initCardForm() {
          addCard({
             name: nameInput.value.trim(),
             link: linkInput.value.trim()
+         }).then((cardData) => {
+            const card = createCard(cardData, {
+               userId,
+               onImageClick: openImagePopup
+            });
+            container.prepend(card);
+            form.reset();
+            clearValidation(form, validationConfig);
+            closeModal(popup);
          })
-            .then(cardData => {
-               const card = createCard(cardData, {
-                  userId,
-                  onImageClick: openImagePopup
-               });
-               container.prepend(card);
-               form.reset();
-               clearValidation(form, validationConfig);
-               closeModal(popup);
-            })
-      )();
+      );
    });
 }
 
@@ -162,11 +155,10 @@ function initAvatarEditing() {
       evt.preventDefault();
 
       handleFormSubmitWithLoading(form, () =>
-         updateAvatar(avatarInput.value.trim())
-            .then(userData => {
-               avatarImage.src = userData.avatar;
-               closeModal(popup);
-            })
-      )();
+         updateAvatar(avatarInput.value.trim()).then((userData) => {
+            avatarImage.src = userData.avatar;
+            closeModal(popup);
+         })
+      );
    });
 }
