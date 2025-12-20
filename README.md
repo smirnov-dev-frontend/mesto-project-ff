@@ -42,19 +42,12 @@ Mesto — это интерактивное веб-приложение, в ко
 1. Клонировать репозиторий:
    ```bash
    git clone https://github.com/USERNAME/mesto-project-ff.git
-
 2. Установить зависимости:
    ```bash 
    npm intall
-
 3. Запустить проект в режиме разработки:
    ```bash 
    npm run dev
-
 4. Собрать production-версию::
    ```bash 
    npm run build
-
-
-
-
