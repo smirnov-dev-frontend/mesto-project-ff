@@ -1,8 +1,8 @@
 import '../styles/pages/index.css';
-import { initialCards } from './cards.js';
-import { createCard, handleDeleteCard, handleLikeCard } from './card.js';
+import { createCard } from './card.js';
 import { initModals, openModal, closeModal } from './modal.js';
 import { enableValidation, clearValidation } from './validation.js';
+import { getUserInfo, getInitialCards, updateUserInfo, addCard, updateAvatar } from './api.js';
 
 const validationConfig = {
    formSelector: '.popup__form',
@@ -13,92 +13,136 @@ const validationConfig = {
    errorClass: 'popup__error_visible'
 };
 
+let userId;
+
 document.addEventListener('DOMContentLoaded', () => {
    initModals();
-   initProfileEditing();
-   initCards();
-   initCardForm();
    enableValidation(validationConfig);
+   initAvatarEditing();
+
+   Promise.all([getUserInfo(), getInitialCards()])
+      .then(([userData, cards]) => {
+         userId = userData._id;
+         fillUserInfo(userData);
+         renderInitialCards(cards);
+      })
+      .catch(console.error);
+
+   initProfileEditing();
+   initCardForm();
 });
 
-function initCards() {
-   const placesWrap = document.querySelector(".places__list");
-
-   initialCards.forEach((data) => {
-      const cardElement = createCard(data, {
-         onDeleteCard: handleDeleteCard,
-         onLikeCard: handleLikeCard,
-         onImageClick: openImagePopup
-      });
-      placesWrap.append(cardElement);
-   });
-}
-
-function openImagePopup(imageSrc, imageAlt) {
-   const imagePopup = document.querySelector('.popup_type_image');
-   const popupImage = imagePopup.querySelector('.popup__image');
-   const popupCaption = imagePopup.querySelector('.popup__caption');
-
-   popupImage.src = imageSrc;
-   popupImage.alt = imageAlt;
-   popupCaption.textContent = imageAlt;
-
-   openModal(imagePopup);
+function fillUserInfo({ name, about, avatar }) {
+   document.querySelector('.profile__title').textContent = name;
+   document.querySelector('.profile__description').textContent = about;
+   document.querySelector('.profile__image').src = avatar;
 }
 
 function initProfileEditing() {
    const editButton = document.querySelector('.profile__edit-button');
-   const editModal = document.querySelector('.popup_type_edit');
-   const formElement = editModal.querySelector('form[name="edit-profile"]');
-   const nameInput = formElement.querySelector('input[name="name"]');
-   const jobInput = formElement.querySelector('input[name="description"]');
-   const profileName = document.querySelector('.profile__title');
-   const profileJob = document.querySelector('.profile__description');
+   const popup = document.querySelector('.popup_type_edit');
+   const form = popup.querySelector('form[name="edit-profile"]');
+   const nameInput = form.querySelector('input[name="name"]');
+   const aboutInput = form.querySelector('input[name="description"]');
 
    editButton.addEventListener('click', () => {
-      nameInput.value = profileName.textContent;
-      jobInput.value = profileJob.textContent;
-      clearValidation(formElement, validationConfig);
-      openModal(editModal);
+      nameInput.value = document.querySelector('.profile__title').textContent;
+      aboutInput.value = document.querySelector('.profile__description').textContent;
+      clearValidation(form, validationConfig);
+      openModal(popup);
    });
 
-   formElement.addEventListener('submit', (evt) => {
+   form.addEventListener('submit', (evt) => {
       evt.preventDefault();
-      profileName.textContent = nameInput.value.trim();
-      profileJob.textContent = jobInput.value.trim();
-      closeModal(editModal);
+      updateUserInfo({
+         name: nameInput.value.trim(),
+         about: aboutInput.value.trim()
+      })
+         .then(userData => {
+            fillUserInfo(userData);
+            closeModal(popup);
+         })
+         .catch(console.error);
    });
+}
+
+function renderInitialCards(cards) {
+   const container = document.querySelector('.places__list');
+   container.innerHTML = '';
+
+   cards.forEach(cardData => {
+      const card = createCard(cardData, {
+         userId,
+         onImageClick: openImagePopup
+      });
+      container.append(card);
+   });
+}
+
+function openImagePopup(link, name) {
+   const popup = document.querySelector('.popup_type_image');
+   popup.querySelector('.popup__image').src = link;
+   popup.querySelector('.popup__image').alt = name;
+   popup.querySelector('.popup__caption').textContent = name;
+   openModal(popup);
 }
 
 function initCardForm() {
    const addButton = document.querySelector('.profile__add-button');
-   const addModal = document.querySelector('.popup_type_new-card');
-   const formElement = addModal.querySelector('form[name="new-place"]');
-   const nameInput = formElement.querySelector('input[name="place-name"]');
-   const linkInput = formElement.querySelector('input[name="link"]');
-   const placesWrap = document.querySelector('.places__list');
+   const popup = document.querySelector('.popup_type_new-card');
+   const form = popup.querySelector('form[name="new-place"]');
+   const nameInput = form.querySelector('input[name="place-name"]');
+   const linkInput = form.querySelector('input[name="link"]');
+   const container = document.querySelector('.places__list');
 
    addButton.addEventListener('click', () => {
-      formElement.reset();
-      clearValidation(formElement, validationConfig);
-      openModal(addModal);
+      form.reset();
+      clearValidation(form, validationConfig);
+      openModal(popup);
    });
 
-   formElement.addEventListener('submit', (evt) => {
+   form.addEventListener('submit', (evt) => {
       evt.preventDefault();
 
-      const newCardData = { name: nameInput.value.trim(), link: linkInput.value.trim() };
-      if (!newCardData.name || !newCardData.link) return;
+      addCard({
+         name: nameInput.value.trim(),
+         link: linkInput.value.trim()
+      })
+         .then(cardData => {
+            const card = createCard(cardData, {
+               userId,
+               onImageClick: openImagePopup
+            });
+            container.prepend(card);
+            form.reset();
+            clearValidation(form, validationConfig);
+            closeModal(popup);
+         })
+         .catch(console.error);
+   });
+}
 
-      const newCardElement = createCard(newCardData, {
-         onDeleteCard: handleDeleteCard,
-         onLikeCard: handleLikeCard,
-         onImageClick: openImagePopup
-      });
+function initAvatarEditing() {
+   const avatarButton = document.querySelector('.profile__avatar-edit-button');
+   const popup = document.querySelector('.popup_type_avatar');
+   const form = popup.querySelector('form[name="edit-avatar"]');
+   const avatarInput = form.querySelector('input[name="avatar"]');
+   const avatarImage = document.querySelector('.profile__image');
 
-      placesWrap.prepend(newCardElement);
-      formElement.reset();
-      clearValidation(formElement, validationConfig);
-      closeModal(addModal);
+   avatarButton.addEventListener('click', () => {
+      form.reset();
+      clearValidation(form, validationConfig);
+      openModal(popup);
+   });
+
+   form.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+
+      updateAvatar(avatarInput.value.trim())
+         .then(userData => {
+            avatarImage.src = userData.avatar;
+            closeModal(popup);
+         })
+         .catch(console.error);
    });
 }
