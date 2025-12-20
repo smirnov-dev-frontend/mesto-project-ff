@@ -38,6 +38,27 @@ function fillUserInfo({ name, about, avatar }) {
    document.querySelector('.profile__image').src = avatar;
 }
 
+function handleFormSubmitWithLoading(form, submitCallback) {
+   const submitButton = form.querySelector(validationConfig.submitButtonSelector);
+   const initialText = submitButton.textContent;
+
+   return (...args) => {
+      submitButton.textContent = 'Сохранение...';
+      submitButton.disabled = true;
+
+      submitCallback(...args)
+         .then(() => {
+            submitButton.textContent = initialText;
+            submitButton.disabled = false;
+         })
+         .catch(err => {
+            console.error(err);
+            submitButton.textContent = initialText;
+            submitButton.disabled = false;
+         });
+   };
+}
+
 function initProfileEditing() {
    const editButton = document.querySelector('.profile__edit-button');
    const popup = document.querySelector('.popup_type_edit');
@@ -54,15 +75,16 @@ function initProfileEditing() {
 
    form.addEventListener('submit', (evt) => {
       evt.preventDefault();
-      updateUserInfo({
-         name: nameInput.value.trim(),
-         about: aboutInput.value.trim()
-      })
-         .then(userData => {
-            fillUserInfo(userData);
-            closeModal(popup);
+      handleFormSubmitWithLoading(form, () =>
+         updateUserInfo({
+            name: nameInput.value.trim(),
+            about: aboutInput.value.trim()
          })
-         .catch(console.error);
+            .then(userData => {
+               fillUserInfo(userData);
+               closeModal(popup);
+            })
+      )();
    });
 }
 
@@ -104,21 +126,22 @@ function initCardForm() {
    form.addEventListener('submit', (evt) => {
       evt.preventDefault();
 
-      addCard({
-         name: nameInput.value.trim(),
-         link: linkInput.value.trim()
-      })
-         .then(cardData => {
-            const card = createCard(cardData, {
-               userId,
-               onImageClick: openImagePopup
-            });
-            container.prepend(card);
-            form.reset();
-            clearValidation(form, validationConfig);
-            closeModal(popup);
+      handleFormSubmitWithLoading(form, () =>
+         addCard({
+            name: nameInput.value.trim(),
+            link: linkInput.value.trim()
          })
-         .catch(console.error);
+            .then(cardData => {
+               const card = createCard(cardData, {
+                  userId,
+                  onImageClick: openImagePopup
+               });
+               container.prepend(card);
+               form.reset();
+               clearValidation(form, validationConfig);
+               closeModal(popup);
+            })
+      )();
    });
 }
 
@@ -138,11 +161,12 @@ function initAvatarEditing() {
    form.addEventListener('submit', (evt) => {
       evt.preventDefault();
 
-      updateAvatar(avatarInput.value.trim())
-         .then(userData => {
-            avatarImage.src = userData.avatar;
-            closeModal(popup);
-         })
-         .catch(console.error);
+      handleFormSubmitWithLoading(form, () =>
+         updateAvatar(avatarInput.value.trim())
+            .then(userData => {
+               avatarImage.src = userData.avatar;
+               closeModal(popup);
+            })
+      )();
    });
 }
