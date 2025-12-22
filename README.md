@@ -1,12 +1,12 @@
-# Mesto
+# Lookplace
 
 Ссылка на GitHub Pages: https://smirnov-dev-frontend.github.io/mesto-project-ff/
 
-Ссылка на репозиторий: https://github.com/smirnov-dev-frontend/mesto-project-ff
+Ссылка на репозиторий: https://github.com/smirnov-dev-frontend/lookplace_21
 
 ## Описание проекта
 
-Mesto — это интерактивное веб-приложение, в котором пользователь может делиться фотографиями, ставить лайки, удалять свои карточки, а также редактировать профиль и аватар.
+Lookplace — это интерактивное веб-приложение, в котором пользователь может делиться фотографиями, ставить лайки, удалять свои карточки, а также редактировать профиль и аватар.
 
 Проект демонстрирует работу с сервером через REST API, обработку форм, модальные окна и динамическое обновление интерфейса.
 
@@ -41,7 +41,7 @@ Mesto — это интерактивное веб-приложение, в ко
 
 1. Клонировать репозиторий:
    ```bash
-   git clone https://github.com/USERNAME/mesto-project-ff.git
+   git clone https://github.com/USERNAME/lookplace_21.git
 2. Установить зависимости:
    ```bash 
    npm intall
