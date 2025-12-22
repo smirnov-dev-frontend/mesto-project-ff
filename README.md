@@ -1,6 +1,6 @@
 # Lookplace
 
-Ссылка на GitHub Pages: https://smirnov-dev-frontend.github.io/mesto-project-ff/
+Ссылка на GitHub Pages: https://smirnov-dev-frontend.github.io/lookplace_21/
 
 Ссылка на репозиторий: https://github.com/smirnov-dev-frontend/lookplace_21
 
